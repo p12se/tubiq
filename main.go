@@ -1,4 +1,3 @@
-
 package main
 
 import (
@@ -17,7 +16,6 @@ var opts struct {
 
 var revision = "unknown"
 
-// Show a navigable tree view of the current directory.
 func main() {
 	fmt.Printf("tubiq %s\n", revision)
 
@@ -36,8 +34,20 @@ func main() {
 		SetRoot(root).
 		SetCurrentNode(root)
 
-	// A helper function which adds the files and directories of the given path
-	// to the given target node.
+	newPrimitive := func(text string) tview.Primitive {
+		return tview.NewTextView().
+			SetTextAlign(tview.AlignCenter).
+			SetText(text)
+	}
+	main := newPrimitive("Main content")
+
+	grid := tview.NewGrid().
+		SetColumns(34, 0).
+		SetBorders(true)
+
+	grid.AddItem(tree, 0, 0, 1, 1, 0, 0, true).
+		AddItem(main, 0, 1, 1, 1, 0, 0, false)
+
 	add := func(target *tview.TreeNode, path string) {
 		lists, err := bq.list(path)
 		if err != nil {
@@ -73,7 +83,7 @@ func main() {
 		}
 	})
 
-	if err := tview.NewApplication().SetRoot(tree, true).EnableMouse(true).Run(); err != nil {
+	if err := tview.NewApplication().SetRoot(grid, true).EnableMouse(true).Run(); err != nil {
 		panic(err)
 	}
 }
