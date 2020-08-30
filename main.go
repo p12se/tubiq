@@ -33,20 +33,13 @@ func main() {
 	tree := tview.NewTreeView().
 		SetRoot(root).
 		SetCurrentNode(root)
+	tree.SetBorder(true).SetTitle("project")
 
-	newPrimitive := func(text string) tview.Primitive {
-		return tview.NewTextView().
-			SetTextAlign(tview.AlignCenter).
-			SetText(text)
-	}
-	main := newPrimitive("Main content")
-
-	grid := tview.NewGrid().
-		SetColumns(34, 0).
-		SetBorders(true)
-
-	grid.AddItem(tree, 0, 0, 1, 1, 0, 0, true).
-		AddItem(main, 0, 1, 1, 1, 0, 0, false)
+	app := tview.NewApplication()
+	flex := tview.NewFlex().
+		AddItem(tree, 0, 1, true).
+		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
+			AddItem(tview.NewBox().SetBorder(true).SetTitle("schema/preview"), 0, 1, false), 0, 2, false)
 
 	add := func(target *tview.TreeNode, path string) {
 		lists, err := bq.list(path)
@@ -83,7 +76,8 @@ func main() {
 		}
 	})
 
-	if err := tview.NewApplication().SetRoot(grid, true).EnableMouse(true).Run(); err != nil {
+	if err := app.SetRoot(flex, true).SetFocus(flex).Run(); err != nil {
 		panic(err)
 	}
+
 }
